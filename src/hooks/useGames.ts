@@ -4,10 +4,11 @@ import { CanceledError } from "axios";
 //this is a custom hook for fetching the games and making the HTTP requests.
 
 
-//to represent the games
-interface Game {
+//to represent the games, they are all properties that comer from the list of game from rawg.io
+export interface Game {
     id: number;
     name: string;
+    background_image: string; 
   }
   
   //to represent and match the properties from rawg.io
