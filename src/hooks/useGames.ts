@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import apiClient from "../services/api-client";
-import { CanceledError } from "axios";
+
+import useData from "./useData";
 //this is a custom hook for fetching the games and making the HTTP requests.
 
 //To display the platform icons.
@@ -18,42 +17,8 @@ export interface Game {
     background_image: string; 
     parent_platforms: { platform: Platform }[];
     metacritic: number;
-
   }
   
-  //to represent and match the properties from rawg.io
-  interface FetchGamesResponse {
-    count: number;
-    results: Game[];
-  }
-const useGames = () =>{
-    const [games, setGames] = useState<Game[]>([]);
-    const [error, setError] = useState("");
-    const [isLoading, setLoading] = useState(false);
-
-  //send the request to the backend, to the /games endpoint.
-  useEffect(() => {
-    const controller = new AbortController();
-
-    setLoading(true);
-    apiClient
-      .get<FetchGamesResponse>("/games", { signal: controller.signal })
-      .then((res) => {
-        setGames(res.data.results);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (err instanceof CanceledError) return;
-        setError(err.message)
-        setLoading(false);
-    });
-
-      return () => controller.abort(); //cleanup function. 
-
-  },[]); //[] to avoid and endless loop of calls to the backend.
-
-  return { games, error, isLoading };
-
-}
+const useGames = () => useData<Game>('/games');
 
 export default useGames;
