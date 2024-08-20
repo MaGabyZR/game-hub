@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import apiClient from "../services/api-client";
-import { CanceledError } from "axios";
+import { AxiosRequestConfig, CanceledError } from "axios";
 
 //to represent and match the properties from rawg.io in a generic way
 
@@ -12,7 +12,7 @@ interface FetchResponse<T>{
 }
 
 
-const useData = <T> (endpoint: string) => {
+const useData = <T> (endpoint: string, requestConfig?: AxiosRequestConfig, deps?: any[]) => {
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState("");
     const [isLoading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const useData = <T> (endpoint: string) => {
 
     setLoading(true);
     apiClient
-      .get<FetchResponse<T>>(endpoint, { signal: controller.signal })
+      .get<FetchResponse<T>>(endpoint, { signal: controller.signal, ...requestConfig }) 
       .then((res) => {
         setData(res.data.results);
         setLoading(false);
@@ -36,7 +36,7 @@ const useData = <T> (endpoint: string) => {
 
       return () => controller.abort(); //cleanup function. 
 
-  },[]); //[] to avoid and endless loop of calls to the backend.
+  }, deps ? [...deps] : []); //[] to avoid and endless loop of calls to the backend, but spread the dependencies array.
 
   return { data, error, isLoading };
 
